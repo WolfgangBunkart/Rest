@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import com.restcourse.spaceship.repository.SpaceDataRepository;
-import com.restcourse.spaceship.repository.TestScenario;
+import com.restcourse.spaceship.repository.StarWarsTestScenario;
 
 @SpringBootApplication
 public class SpaceshipServiceApplication {
@@ -17,7 +17,7 @@ public class SpaceshipServiceApplication {
 	
 	@Bean
 //	@Profile("test")
-	public SpaceDataRepository createRepository(TestScenario testSenario) {
+	public SpaceDataRepository createRepository(StarWarsTestScenario testSenario) {
 		testSenario.initTestData();
 		return new SpaceDataRepository(testSenario.getPilots(), testSenario.getSpaceships());
 	}

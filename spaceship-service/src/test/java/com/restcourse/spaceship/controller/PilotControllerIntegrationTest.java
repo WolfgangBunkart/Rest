@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.restcourse.spaceship.repository.SpaceDataRepository;
-import com.restcourse.spaceship.repository.TestScenario;
+import com.restcourse.spaceship.repository.StarWarsTestScenario;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
