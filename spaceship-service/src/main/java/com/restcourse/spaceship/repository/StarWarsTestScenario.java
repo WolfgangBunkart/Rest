@@ -11,7 +11,7 @@ import com.restcourse.spaceship.model.Pilot;
 import com.restcourse.spaceship.model.Spaceship;
 
 @Component
-@Profile("test")
+//@Profile("test")
 public class StarWarsTestScenario {
 	
 	private ArrayList<Pilot> pilots = new ArrayList<Pilot>();

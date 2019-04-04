@@ -17,9 +17,9 @@ public class SpaceshipServiceApplication {
 	
 	@Bean
 //	@Profile("test")
-	public SpaceDataRepository createRepository(StarWarsTestScenario testSenario) {
-		testSenario.initTestData();
-		return new SpaceDataRepository(testSenario.getPilots(), testSenario.getSpaceships());
+	public SpaceDataRepository createRepository(StarWarsTestScenario starWarsTestSenario) {
+		starWarsTestSenario.initTestData();
+		return new SpaceDataRepository(starWarsTestSenario.getPilots(), starWarsTestSenario.getSpaceships());
 	}
 
 }
