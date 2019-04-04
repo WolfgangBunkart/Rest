@@ -27,13 +27,13 @@ public class TestScenario {
 		Spaceship tieFighter3 = new Spaceship(6L, "TIE FIGHTER 3", Group.REBELLION, true, true, 2);
 		
 
-		Pilot rebelPilot1 = new Pilot(1L, "Luke", "Skywalker", Group.REBELLION);
-		Pilot rebelPilot2 = new Pilot(2L, "Wedge", "Antilles", Group.REBELLION);
-		Pilot rebelPilot3 = new Pilot(3L, "Poe", "Dameron", Group.REBELLION);
+		Pilot rebelPilot1 = new Pilot(1L, "Luke", "Skywalker", Group.EMPIRE);
+		Pilot rebelPilot2 = new Pilot(2L, "Wedge", "Antilles", Group.EMPIRE);
+		Pilot rebelPilot3 = new Pilot(3L, "Poe", "Dameron", Group.EMPIRE);
 
-		Pilot empirePilot1 = new Pilot(4L, "Darth", "Vader", Group.REBELLION);
-		Pilot empirePilot2 = new Pilot(5L, "FN", "2198", Group.REBELLION);
-		Pilot empirePilot3 = new Pilot(6L, "FN", "2199", Group.REBELLION);
+		Pilot empirePilot1 = new Pilot(4L, "Darth", "Vader", Group.EMPIRE);
+		Pilot empirePilot2 = new Pilot(5L, "FN", "2198", Group.EMPIRE);
+		Pilot empirePilot3 = new Pilot(6L, "FN", "2199", Group.EMPIRE);
 
 		pilots.clear();
 		spaceships.clear();
