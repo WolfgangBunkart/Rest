@@ -60,12 +60,20 @@ public class SpaceshipService {
 		repository.deleteSpaceship(id);
 	}
 
-	public Optional<Spaceship> createOrUpdateSpaceship(Long id, Spaceship spaceship, boolean overrideAttribtuesWithNull)
+	public Optional<Spaceship> patchSpaceship(Long id, Spaceship spaceship) throws GroupNotChangeableException{
+		return createOrUpdateSpaceship(id, spaceship, false);
+	}
+	
+	public Optional<Spaceship> createOrUpdateSpaceship(Long id, Spaceship spaceship) throws GroupNotChangeableException{
+		return createOrUpdateSpaceship(id, spaceship, true);
+	}
+	
+	private Optional<Spaceship> createOrUpdateSpaceship(Long id, Spaceship spaceship, boolean overrideAttribtuesWithNull)
 			throws GroupNotChangeableException {
-		Optional<Spaceship> existingSpaceship = findSpaceship(id);
+ 		Optional<Spaceship> existingSpaceship = findSpaceship(id);
 		if (existingSpaceship.isPresent()) {
 			validator.validate(existingSpaceship.get(), spaceship);
-			mapObject(id, spaceship, existingSpaceship, overrideAttribtuesWithNull);
+			mapObject(id, spaceship, existingSpaceship.get(), overrideAttribtuesWithNull);
 			return Optional.of(existingSpaceship.get());
 		} else {
 			spaceship.setId(id);
@@ -95,10 +103,10 @@ public class SpaceshipService {
 		Optional<Pilot> exisitingPilot = findPilot(id);
 		if (exisitingPilot.isPresent()) {
 			validator.validate(exisitingPilot.get(), pilot);
-			mapObject(id, pilot, exisitingPilot, overrideAttribtuesWithNull);
+			mapObject(id, pilot, exisitingPilot.get(), overrideAttribtuesWithNull);
 			exisitingPilot.get().setId(pilot.getId());
 		}
-		return Optional.of(pilot);
+		return Optional.of(exisitingPilot.get());
 	}
 
 	public Optional<Spaceship> updatePilotSpaceshipRelation(Long spaceshipId, Long pilotId) {
@@ -128,7 +136,7 @@ public class SpaceshipService {
 		Pilot result = null;
 		Optional<Pilot> existingPilot = findPilot(id);
 		if (existingPilot.isPresent()) {
-			mapObject(id, pilot, existingPilot, false);
+			mapObject(id, pilot, existingPilot.get(), false);
 			validator.validate(existingPilot.get(), pilot);
 			result = existingPilot.get();
 		}
