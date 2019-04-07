@@ -14,7 +14,7 @@ public class Spaceship {
 	@Size(min = 5, message = "The name must be min 5 characters")
 	private String name;
 	
-	private String serialNumber;
+	private String serialNumber = "12345";
 	
 	private Integer numberOfWeapons;
 	

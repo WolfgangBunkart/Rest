@@ -22,14 +22,14 @@ public class StarWarsTestScenario {
 		Spaceship xwing2 = new Spaceship(2L, "X-WING 2", Group.REBELLION, true, true, 4);
 		Spaceship xwing3 = new Spaceship(3L, "X-WING 3", Group.REBELLION, true, false, 4);
 		
-		Spaceship tieFighter1 = new Spaceship(4L, "TIE FIGHTER 1", Group.REBELLION, true, true, 2);
-		Spaceship tieFighter2 = new Spaceship(5L, "TIE FIGHTER 2", Group.REBELLION, true, false, 2);
-		Spaceship tieFighter3 = new Spaceship(6L, "TIE FIGHTER 3", Group.REBELLION, true, true, 2);
+		Spaceship tieFighter1 = new Spaceship(4L, "TIE FIGHTER 1", Group.EMPIRE, true, true, 2);
+		Spaceship tieFighter2 = new Spaceship(5L, "TIE FIGHTER 2", Group.EMPIRE, true, false, 2);
+		Spaceship tieFighter3 = new Spaceship(6L, "TIE FIGHTER 3", Group.EMPIRE, true, true, 2);
 		
 
-		Pilot rebelPilot1 = new Pilot(1L, "Luke", "Skywalker", Group.EMPIRE);
-		Pilot rebelPilot2 = new Pilot(2L, "Wedge", "Antilles", Group.EMPIRE);
-		Pilot rebelPilot3 = new Pilot(3L, "Poe", "Dameron", Group.EMPIRE);
+		Pilot rebelPilot1 = new Pilot(1L, "Luke", "Skywalker", Group.REBELLION);
+		Pilot rebelPilot2 = new Pilot(2L, "Wedge", "Antilles", Group.REBELLION);
+		Pilot rebelPilot3 = new Pilot(3L, "Poe", "Dameron", Group.REBELLION);
 
 		Pilot empirePilot1 = new Pilot(4L, "Darth", "Vader", Group.EMPIRE);
 		Pilot empirePilot2 = new Pilot(5L, "FN", "2198", Group.EMPIRE);

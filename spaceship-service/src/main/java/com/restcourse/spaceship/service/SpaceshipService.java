@@ -1,14 +1,16 @@
 package com.restcourse.spaceship.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import org.modelmapper.Conditions;
-import org.modelmapper.ModelMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.restcourse.spaceship.exception.AttributesAreNotValidException;
 import com.restcourse.spaceship.exception.GroupNotChangeableException;
 import com.restcourse.spaceship.model.Pilot;
 import com.restcourse.spaceship.model.Spaceship;
@@ -29,61 +31,60 @@ public class SpaceshipService {
 		this.validator = validator;
 	}
 
-	public Optional<Spaceship> findSpaceship(Long id) {
-		return repository.findSpaceship(id);
+	public Spaceship createSpaceship(Spaceship spaceship) {
+		Objects.requireNonNull(spaceship, "spaceship is not set");
+		Spaceship createdSpaceship = repository.createSpaceship(null, spaceship);
+		log.debug("Spaceship created with ID: {}", createdSpaceship.getId());
+		return createdSpaceship;
 	}
 
-	public Optional<List<Spaceship>> getAllSpaceships(Boolean readyToFly) {
-		Optional<List<Spaceship>>  result = Optional.empty();
-		if(readyToFly == null) {
-			result =  getAllSpaceships();
-		}else if(readyToFly) {
-			result = repository.findReadyToFlySpaceships();			
-		}else {
-			result = repository.findNotReadyToFlySpaceships();
-		}
-		return result;
+	public Optional<Spaceship> findSpaceship(Long id) {
+		Objects.requireNonNull(id, "id is not set");
+		return repository.findSpaceship(id);
 	}
-	
 
 	public Optional<List<Spaceship>> getAllSpaceships() {
 		return repository.getAllSpaceships();
 	}
 
-	public Spaceship createSpaceship(Spaceship spaceship) {
-		Spaceship createdSpaceship = repository.createSpaceship(spaceship);
-		log.debug("Spaceship created with ID: {}", createdSpaceship.getId());
-		return createdSpaceship;
+	public Optional<List<Spaceship>> getAllSpaceships(boolean readyToFly) {
+		if (readyToFly) {
+			return repository.findReadyToFlySpaceships();
+		}
+		return repository.findNotReadyToFlySpaceships();
 	}
 
 	public void deleteSpaceship(Long id) {
 		repository.deleteSpaceship(id);
 	}
 
-	public Optional<Spaceship> patchSpaceship(Long id, Spaceship spaceship) throws GroupNotChangeableException{
-		return createOrUpdateSpaceship(id, spaceship, false);
+	public Optional<Spaceship> patchSpaceship(Long id, Map<String, Object> spaceshipAttributes)
+			throws GroupNotChangeableException, AttributesAreNotValidException {
+		Objects.requireNonNull(spaceshipAttributes, "Attributes not set");
+		Objects.requireNonNull(id, "id is not set");
+		Optional<Spaceship> exisitingSpaceship = findSpaceship(id);
+		log.debug("Patching Spaceship with ID: {}", id);
+		if (exisitingSpaceship.isPresent()) {
+			validator.validate(exisitingSpaceship.get(), spaceshipAttributes);
+		}
+		return repository.update(id, spaceshipAttributes, exisitingSpaceship.get());
 	}
-	
-	public Optional<Spaceship> createOrUpdateSpaceship(Long id, Spaceship spaceship) throws GroupNotChangeableException{
-		return createOrUpdateSpaceship(id, spaceship, true);
-	}
-	
-	private Optional<Spaceship> createOrUpdateSpaceship(Long id, Spaceship spaceship, boolean overrideAttribtuesWithNull)
+
+	public Optional<Spaceship> createOrUpdateSpaceship(Long id, Spaceship spaceship)
 			throws GroupNotChangeableException {
- 		Optional<Spaceship> existingSpaceship = findSpaceship(id);
+		Objects.requireNonNull(spaceship, "spaceship is not set");
+		Objects.requireNonNull(id, "id is not set");
+		log.debug("Creating or Updating Spaceship with ID: {}", id);
+		Optional<Spaceship> existingSpaceship = findSpaceship(id);
 		if (existingSpaceship.isPresent()) {
 			validator.validate(existingSpaceship.get(), spaceship);
-			mapObject(id, spaceship, existingSpaceship.get(), overrideAttribtuesWithNull);
-			return Optional.of(existingSpaceship.get());
-		} else {
-			spaceship.setId(id);
-			repository.add(spaceship);
 		}
-		return Optional.empty();
+		return repository.createOrUpdate(id, spaceship);
 	}
 
 	public Pilot createPilot(Pilot pilot) {
-		return repository.createPilot(pilot);
+		Objects.requireNonNull(pilot, "pilot is not set");
+		return repository.createPilot(pilot, null);
 	}
 
 	public Optional<List<Pilot>> getAllPilots() {
@@ -91,25 +92,29 @@ public class SpaceshipService {
 	}
 
 	public Optional<Pilot> findPilot(Long id) {
+		Objects.requireNonNull(id, "id is not set");
 		return repository.findPilot(id);
 	}
 
 	public void deletePilot(Long id) {
+		Objects.requireNonNull(id, "id is not set");
 		repository.deletePilot(id);
 	}
 
-	public Optional<Pilot> createOrUpdatePilot(Long id, Pilot pilot, boolean overrideAttribtuesWithNull)
+	public Optional<Pilot> createOrUpdatePilot(Long id, Pilot pilot)
 			throws GroupNotChangeableException {
+		Objects.requireNonNull(id, "id is not set");
+		Objects.requireNonNull(pilot, "pilot is not set");
 		Optional<Pilot> exisitingPilot = findPilot(id);
 		if (exisitingPilot.isPresent()) {
 			validator.validate(exisitingPilot.get(), pilot);
-			mapObject(id, pilot, exisitingPilot.get(), overrideAttribtuesWithNull);
-			exisitingPilot.get().setId(pilot.getId());
 		}
-		return Optional.of(exisitingPilot.get());
+		return repository.createOrUpdate(id, pilot);
 	}
 
 	public Optional<Spaceship> updatePilotSpaceshipRelation(Long spaceshipId, Long pilotId) {
+		Objects.requireNonNull(pilotId, "pilotId is not set");
+		Objects.requireNonNull(spaceshipId, "spaceshipId is not set");
 		Optional<Spaceship> spaceship = findSpaceship(spaceshipId);
 		Optional<Pilot> pilot = findPilot(pilotId);
 		if (spaceship.isPresent() && pilot.isPresent()) {
@@ -121,6 +126,8 @@ public class SpaceshipService {
 	}
 
 	public Optional<Spaceship> deletePilotSpaceshipRelation(Long spaceshipId, Long pilotId) {
+		Objects.requireNonNull(pilotId, "pilotId is not set");
+		Objects.requireNonNull(spaceshipId, "spaceshipId is not set");
 		Optional<Spaceship> spaceship = findSpaceship(spaceshipId);
 		if (spaceship.isPresent()) {
 			Optional<Pilot> foundPilot = spaceship.get().getPilots().stream()//
@@ -132,23 +139,13 @@ public class SpaceshipService {
 		return spaceship;
 	}
 
-	public Optional<Pilot> patchPilot(Long id, Pilot pilot) throws GroupNotChangeableException {
-		Pilot result = null;
+	public Optional<Pilot> patchPilot(Long id, Map<String, Object> pilotAttributes)
+			throws GroupNotChangeableException, AttributesAreNotValidException {
 		Optional<Pilot> existingPilot = findPilot(id);
 		if (existingPilot.isPresent()) {
-			mapObject(id, pilot, existingPilot.get(), false);
-			validator.validate(existingPilot.get(), pilot);
-			result = existingPilot.get();
+			validator.validate(existingPilot.get(), pilotAttributes);
+			ServiceUtils.fillObjectWithAttributes(pilotAttributes, existingPilot.get());
 		}
-		return Optional.ofNullable(result);
+		return existingPilot;
 	}
-
-	private void mapObject(Long id, Object sourceObject, Object targetObject, boolean overrideAttribtuesWithNull) {
-		ModelMapper modelMapper = new ModelMapper();
-		if (!overrideAttribtuesWithNull) {
-			modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		}
-		modelMapper.map(sourceObject, targetObject);
-	}
-
 }
