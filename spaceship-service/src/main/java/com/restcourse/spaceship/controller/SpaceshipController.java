@@ -61,23 +61,13 @@ public class SpaceshipController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	// PUT http://localhost:8080/spaceships/1
-	
 	@PutMapping("spaceships/{id}")
 	public ResponseEntity<Spaceship> updateSpaceship(@PathVariable(name = "id", required = true) Long id, @RequestBody Spaceship spaceship) throws GroupNotChangeableException{
 		return spaceshipService.createOrUpdateSpaceship(id, spaceship)
 		.map(s -> ResponseEntity.ok(s))//
 		.orElseGet(() -> ResponseEntity.notFound().build());
 	}
-	
-	
-//	@PatchMapping("spaceships/{id}")
-//	public ResponseEntity<Spaceship> patchSpaceship(@PathVariable(name = "id", required = true) Long id, @RequestBody Spaceship spaceship) throws GroupNotChangeableException{
-//		return spaceshipService.patchSpaceship(id, spaceship)
-//		.map(s -> ResponseEntity.ok(s))//
-//		.orElseGet(() -> ResponseEntity.notFound().build());
-//	}
-	
+
 	@PatchMapping("spaceships/{id}")
 	public ResponseEntity<Spaceship> patchSpaceship(@PathVariable(name = "id", required = true) Long id, @RequestBody Map<String, Object> spaceshipAttributes) throws GroupNotChangeableException, AttributesAreNotValidException{
 		return spaceshipService.patchSpaceship(id, spaceshipAttributes)
