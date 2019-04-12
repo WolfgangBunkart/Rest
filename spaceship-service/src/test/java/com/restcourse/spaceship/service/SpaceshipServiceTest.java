@@ -27,7 +27,7 @@ public class SpaceshipServiceTest {
 	public void setup() {
 		testScenario.initTestData();
 		SpaceDataRepository repo = new SpaceDataRepository(testScenario.getPilots(), testScenario.getSpaceships());
-		service = new SpaceshipService(repo, new BusinessValidator());
+		service = new SpaceshipServiceImpl(repo, new BusinessValidator());
 	}
 
 	@Test

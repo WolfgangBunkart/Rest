@@ -15,7 +15,7 @@ public class SpaceshipServiceApplication {
 		SpringApplication.run(SpaceshipServiceApplication.class, args);
 	}
 	
-	@Bean
+	@Bean("spaceDataRepository")
 //	@Profile("test")
 	public SpaceDataRepository createRepository(StarWarsTestScenario starWarsTestSenario) {
 		starWarsTestSenario.initTestData();
