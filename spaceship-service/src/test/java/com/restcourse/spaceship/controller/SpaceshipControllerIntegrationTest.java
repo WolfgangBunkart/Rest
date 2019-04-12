@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,6 +71,63 @@ public class SpaceshipControllerIntegrationTest {
 		Spaceship expectedSpaceship = repository.findSpaceship(1L).get();
 
 		assertThat(spaceship).isEqualTo(expectedSpaceship);
+	}
+	
+	@Test
+	public void createSpaceship() throws Exception {
+		Spaceship spaceshipOne = new Spaceship();
+		spaceshipOne.setName("spaceshipOne");
+		
+		spaceshipOne.setGroup(Group.EMPIRE);
+		spaceshipOne.setReadyToFly(true);
+
+		String json = TestUtil.toJson(spaceshipOne);
+
+		MvcResult result = mockMvc.perform(//
+				post(baseUrl + "/spaceships")//
+						.contentType(MediaType.APPLICATION_JSON)//
+						.content(json))//
+				.andExpect(status().is2xxSuccessful())//
+				.andReturn();
+
+		Spaceship resultSpaceship = TestUtil.toObject(result.getResponse().getContentAsString(), Spaceship.class);
+		assertThat(resultSpaceship.getId()).isNotNull();
+		assertThat(resultSpaceship.getName()).isEqualTo("spaceshipOne");
+		assertThat(resultSpaceship.isReadyToFly()).isTrue();
+		assertThat(resultSpaceship.getGroup()).isEqualTo(Group.EMPIRE);
+	}
+	
+	@Test
+	public void createSpaceshipNameNotSetValidationFailed() throws Exception {
+		Spaceship spaceshipOne = new Spaceship();
+		
+		spaceshipOne.setGroup(Group.EMPIRE);
+		spaceshipOne.setReadyToFly(true);
+
+		String json = TestUtil.toJson(spaceshipOne);
+
+		mockMvc.perform(//
+				post(baseUrl + "/spaceships")//
+						.contentType(MediaType.APPLICATION_JSON)//
+						.content(json))//
+				.andExpect(status().is4xxClientError());
+	}
+
+	@Test
+	public void createSpaceshipNameNotValidValidationFailed() throws Exception {
+		Spaceship spaceshipOne = new Spaceship();
+		
+		spaceshipOne.setGroup(Group.EMPIRE);
+		spaceshipOne.setReadyToFly(true);
+		spaceshipOne.setName("1234");
+		
+		String json = TestUtil.toJson(spaceshipOne);
+		
+		mockMvc.perform(//
+				post(baseUrl + "/spaceships")//
+				.contentType(MediaType.APPLICATION_JSON)//
+				.content(json))//
+		.andExpect(status().is4xxClientError());
 	}
 
 	@Test
@@ -228,3 +286,4 @@ public class SpaceshipControllerIntegrationTest {
 	
 
 }
+

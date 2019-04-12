@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +53,7 @@ public class SpaceshipController {
 	}
 
 	@PostMapping(path = "spaceships", consumes = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<Spaceship> createSpaceship(@RequestBody Spaceship spaceship) {
+	public ResponseEntity<Spaceship> createSpaceship(@Valid @RequestBody Spaceship spaceship) {
 		Spaceship createdSpaceship = spaceshipService.createSpaceship(spaceship);
 		return ResponseEntity.created(URI.create("")).body(createdSpaceship);
 	}
@@ -63,7 +65,7 @@ public class SpaceshipController {
 	}
 	
 	@PutMapping("spaceships/{id}")
-	public ResponseEntity<Spaceship> updateSpaceship(@PathVariable(name = "id", required = true) Long id, @RequestBody Spaceship spaceship) throws GroupNotChangeableException{
+	public ResponseEntity<Spaceship> updateSpaceship(@PathVariable(name = "id", required = true) Long id, @Valid @RequestBody Spaceship spaceship) throws GroupNotChangeableException{
 		return spaceshipService.createOrUpdateSpaceship(id, spaceship)
 		.map(s -> ResponseEntity.ok(s))//
 		.orElseGet(() -> ResponseEntity.notFound().build());

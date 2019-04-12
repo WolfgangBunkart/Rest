@@ -51,7 +51,10 @@ public class SpaceshipServiceImpl implements SpaceshipService {
 	}
 
 	@Override
-	public Optional<List<Spaceship>> getAllSpaceships(boolean readyToFly) {
+	public Optional<List<Spaceship>> getAllSpaceships(Boolean readyToFly) {
+		if(readyToFly == null) {
+			return repository.findAllSpaceships();
+		}
 		if (readyToFly) {
 			return repository.findReadyToFlySpaceships();
 		}

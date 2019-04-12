@@ -17,7 +17,7 @@ public interface SpaceshipService {
 
 	Optional<List<Spaceship>> getAllSpaceships();
 
-	Optional<List<Spaceship>> getAllSpaceships(boolean readyToFly);
+	Optional<List<Spaceship>> getAllSpaceships(Boolean readyToFly);
 
 	void deleteSpaceship(Long id);
 

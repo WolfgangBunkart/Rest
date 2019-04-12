@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,7 +53,7 @@ public class PilotController {
 	}
 	
 	@PutMapping("pilots/{id}")
-	public ResponseEntity<Pilot> updateOnePilot(@PathVariable(name = "id", required = true) Long id, @RequestBody Pilot pilot) throws GroupNotChangeableException{
+	public ResponseEntity<Pilot> updateOnePilot(@PathVariable(name = "id", required = true) Long id, @Valid @RequestBody Pilot pilot) throws GroupNotChangeableException{
 		return service.createOrUpdatePilot(id, pilot)
 				.map(p -> ResponseEntity.ok(p))
 				.orElseGet(() -> ResponseEntity.notFound().build());
@@ -65,7 +67,7 @@ public class PilotController {
 	}
 	
 	@PostMapping("pilots")
-	public ResponseEntity<Pilot> createOnePilot(@RequestBody Pilot pilot) throws GroupNotChangeableException{
+	public ResponseEntity<Pilot> createOnePilot(@Valid @RequestBody Pilot pilot) throws GroupNotChangeableException{
 		return ResponseEntity.created(URI.create("")).body(service.createPilot(pilot));
 	}
 	

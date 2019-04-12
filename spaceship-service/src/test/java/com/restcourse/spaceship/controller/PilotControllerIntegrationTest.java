@@ -121,11 +121,12 @@ public class PilotControllerIntegrationTest {
 	}
 
 	@Test
-	public void testCreateOnePilot() throws Exception {
+	public void testCreateOnePilotSucess() throws Exception {
 		
 		Pilot pilot = new Pilot();
 		pilot.setGroup(Group.EMPIRE);
-		pilot.setFirstName("CreatedByPUT");
+		pilot.setFirstName("firstName");
+		pilot.setLastName("lastName");
 		
 		String json = TestUtil.toJson(pilot);
 		MvcResult result = mockMvc.perform(put(baseUrl + "/pilots/10")
@@ -134,9 +135,24 @@ public class PilotControllerIntegrationTest {
 				.andExpect(status().is2xxSuccessful()).andReturn();
 		
 		Pilot updatedPilot = TestUtil.toObject(result.getResponse().getContentAsString(), Pilot.class);
-		assertThat(updatedPilot.getFirstName()).isEqualTo("CreatedByPUT");
+		assertThat(updatedPilot.getFirstName()).isEqualTo("firstName");
+		assertThat(updatedPilot.getLastName()).isEqualTo("lastName");
 		assertThat(updatedPilot.getGroup()).isEqualTo(Group.EMPIRE);
 		assertThat(updatedPilot.getId()).isEqualTo(10L);
+	}
+	
+	@Test
+	public void testCreateOnePilotLastNameNotSetValidationFailed() throws Exception {
+		
+		Pilot pilot = new Pilot();
+		pilot.setGroup(Group.EMPIRE);
+		pilot.setFirstName("CreatedByPUT");
+		
+		String json = TestUtil.toJson(pilot);
+		mockMvc.perform(put(baseUrl + "/pilots/10")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json))//
+				.andExpect(status().is4xxClientError());
 	}
 	
 	@Test
@@ -183,7 +199,8 @@ public class PilotControllerIntegrationTest {
 		
 		Pilot pilot = new Pilot();
 		pilot.setGroup(Group.EMPIRE);
-		pilot.setFirstName("CreatedByPOST");
+		pilot.setFirstName("FirstNameCreatedByPOST");
+		pilot.setLastName("LastNameCreatedByPOST");
 		
 		String json = TestUtil.toJson(pilot);
 		MvcResult result = mockMvc.perform(post(baseUrl + "/pilots")
@@ -192,7 +209,8 @@ public class PilotControllerIntegrationTest {
 				.andExpect(status().is2xxSuccessful()).andReturn();
 		
 		Pilot updatedPilot = TestUtil.toObject(result.getResponse().getContentAsString(), Pilot.class);
-		assertThat(updatedPilot.getFirstName()).isEqualTo("CreatedByPOST");
+		assertThat(updatedPilot.getFirstName()).isEqualTo("FirstNameCreatedByPOST");
+		assertThat(updatedPilot.getLastName()).isEqualTo("LastNameCreatedByPOST");
 		assertThat(updatedPilot.getGroup()).isEqualTo(Group.EMPIRE);
 		assertThat(updatedPilot.getId()).isNotNull();
 	}

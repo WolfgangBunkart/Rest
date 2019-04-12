@@ -110,6 +110,10 @@ public class SpaceDataRepository {
 		return Optional.ofNullable(spaceships.stream().filter(s -> s.isReadyToFly()).collect(Collectors.toList()));
 	}
 
+	public Optional<List<Spaceship>> findAllSpaceships() {
+		return Optional.ofNullable(spaceships);
+	}
+
 	public Optional<List<Spaceship>> findNotReadyToFlySpaceships() {
 		return Optional.ofNullable(spaceships.stream().filter(s -> !s.isReadyToFly()).collect(Collectors.toList()));
 	}
