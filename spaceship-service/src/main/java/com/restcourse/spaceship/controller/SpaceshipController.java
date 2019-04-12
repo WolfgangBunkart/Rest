@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.restcourse.spaceship.exception.AttributesAreNotValidException;
 import com.restcourse.spaceship.exception.GroupNotChangeableException;
+import com.restcourse.spaceship.model.Pilot;
 import com.restcourse.spaceship.model.Spaceship;
 import com.restcourse.spaceship.service.SpaceshipService;
 
@@ -74,5 +75,13 @@ public class SpaceshipController {
 				.map(s -> ResponseEntity.ok(s))//
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
+	
+	@PatchMapping("spaceships/{id}/pilots")
+	public ResponseEntity<Spaceship> patchSpaceshipRelation(@PathVariable(name = "id", required = true) Long spaceshipId, @RequestBody List<Pilot> pilots) throws GroupNotChangeableException, AttributesAreNotValidException{
+		return spaceshipService.updatePilotSpaceshipRelations(spaceshipId, pilots)
+				.map(s -> ResponseEntity.ok(s))//
+				.orElseGet(() -> ResponseEntity.notFound().build());
+	}
+	
 	
 }
