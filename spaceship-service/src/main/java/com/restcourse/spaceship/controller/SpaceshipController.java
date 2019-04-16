@@ -8,6 +8,8 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,31 +33,37 @@ public class SpaceshipController {
 
 	private SpaceshipService spaceshipService;
 
+	private SpaceResourceAssembler assembler;
+
 	@Autowired
-	public SpaceshipController(SpaceshipService spaceshipService) {
+	public SpaceshipController(SpaceshipService spaceshipService, SpaceResourceAssembler assembler) {
 		this.spaceshipService = spaceshipService;
+		this.assembler = assembler;
 	}
 
 	@GetMapping("spaceships")
-	public ResponseEntity<List<Spaceship>> getAllSpaceships(
+	public ResponseEntity<Resources<Resource<Spaceship>>> getAllSpaceships(
 			@RequestParam(name = "readyToFly", required = false) Boolean readyToFly) {
-
 		return spaceshipService.getAllSpaceships(readyToFly)//
+				.map(spaceships -> assembler.buildSpaceshipResouces(spaceships))//
 				.map(spaceships -> ResponseEntity.ok(spaceships))//
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
 	@GetMapping("spaceships/{id}")
-	public ResponseEntity<Spaceship> getSpaceship(@PathVariable(name = "id", required = true) Long id) {
+	public ResponseEntity<Resource<Spaceship>> getSpaceship(@PathVariable(name = "id", required = true) Long id) {
 		return spaceshipService.findSpaceship(id)//
-				.map(spaceship -> ResponseEntity.ok(spaceship))
+				.map(spaceship -> assembler.buildSpaceshipResouce(spaceship))
+				.map(spaceship -> ResponseEntity.ok(spaceship))//
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
 	@PostMapping(path = "spaceships", consumes = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<Spaceship> createSpaceship(@Valid @RequestBody Spaceship spaceship) {
-		Spaceship createdSpaceship = spaceshipService.createSpaceship(spaceship);
-		return ResponseEntity.created(URI.create("")).body(createdSpaceship);
+	public ResponseEntity<Resource<Spaceship>> createSpaceship(@Valid @RequestBody Spaceship spaceship) {
+		return Optional.ofNullable(spaceshipService.createSpaceship(spaceship))
+				.map(sp -> assembler.buildSpaceshipResouce(sp))
+				.map(sp -> ResponseEntity.created(URI.create("")).body(sp))
+				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
 	@DeleteMapping("spaceships/{id}")
@@ -63,27 +71,34 @@ public class SpaceshipController {
 		spaceshipService.deleteSpaceship(id);
 		return ResponseEntity.noContent().build();
 	}
-	
+
 	@PutMapping("spaceships/{id}")
-	public ResponseEntity<Spaceship> updateSpaceship(@PathVariable(name = "id", required = true) Long id, @Valid @RequestBody Spaceship spaceship) throws GroupNotChangeableException{
-		return spaceshipService.createOrUpdateSpaceship(id, spaceship)
-		.map(s -> ResponseEntity.ok(s))//
-		.orElseGet(() -> ResponseEntity.notFound().build());
+	public ResponseEntity<Resource<Spaceship>> updateSpaceship(@PathVariable(name = "id", required = true) Long id,
+			@Valid @RequestBody Spaceship spaceship) throws GroupNotChangeableException {
+		return spaceshipService.createOrUpdateSpaceship(id, spaceship)//
+				.map(s -> assembler.buildSpaceshipResouce(s))//
+				.map(s -> ResponseEntity.ok(s))//
+				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
 	@PatchMapping("spaceships/{id}")
-	public ResponseEntity<Spaceship> patchSpaceship(@PathVariable(name = "id", required = true) Long id, @RequestBody Map<String, Object> spaceshipAttributes) throws GroupNotChangeableException, AttributesAreNotValidException{
-		return spaceshipService.patchSpaceship(id, spaceshipAttributes)
+	public ResponseEntity<Resource<Spaceship>> patchSpaceship(@PathVariable(name = "id", required = true) Long id,
+			@RequestBody Map<String, Object> spaceshipAttributes)
+			throws GroupNotChangeableException, AttributesAreNotValidException {
+		return spaceshipService.patchSpaceship(id, spaceshipAttributes)//
+				.map(s -> assembler.buildSpaceshipResouce(s))//
 				.map(s -> ResponseEntity.ok(s))//
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
-	
+
 	@PatchMapping("spaceships/{id}/pilots")
-	public ResponseEntity<Spaceship> patchSpaceshipRelation(@PathVariable(name = "id", required = true) Long spaceshipId, @RequestBody List<Pilot> pilots) throws GroupNotChangeableException, AttributesAreNotValidException{
+	public ResponseEntity<Resource<Spaceship>> patchSpaceshipRelation(
+			@PathVariable(name = "id", required = true) Long spaceshipId, @RequestBody List<Pilot> pilots)
+			throws GroupNotChangeableException, AttributesAreNotValidException {
 		return spaceshipService.updatePilotSpaceshipRelations(spaceshipId, pilots)
+				.map(s -> assembler.buildSpaceshipResouce(s))//
 				.map(s -> ResponseEntity.ok(s))//
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
-	
-	
+
 }

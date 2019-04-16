@@ -22,14 +22,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.restcourse.spaceship.SpaceshipServiceApplication;
 import com.restcourse.spaceship.model.Group;
 import com.restcourse.spaceship.model.Pilot;
 import com.restcourse.spaceship.model.Spaceship;
@@ -39,6 +45,7 @@ import com.restcourse.spaceship.repository.StarWarsTestScenario;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = SpaceshipServiceApplication.class)
 @AutoConfigureMockMvc
 public class SpaceshipControllerIntegrationTest {
 
@@ -67,7 +74,7 @@ public class SpaceshipControllerIntegrationTest {
 		MvcResult result = mockMvc.perform(get(baseUrl + "/spaceships/1"))//
 				.andExpect(status().is2xxSuccessful()).andReturn();
 
-		Spaceship spaceship = TestUtil.toObject(result.getResponse().getContentAsString(), Spaceship.class);
+		Spaceship spaceship = TestUtil.resourceJsonToSpaceship(result.getResponse().getContentAsString());
 		Spaceship expectedSpaceship = repository.findSpaceship(1L).get();
 
 		assertThat(spaceship).isEqualTo(expectedSpaceship);
@@ -90,7 +97,7 @@ public class SpaceshipControllerIntegrationTest {
 				.andExpect(status().is2xxSuccessful())//
 				.andReturn();
 
-		Spaceship resultSpaceship = TestUtil.toObject(result.getResponse().getContentAsString(), Spaceship.class);
+		Spaceship resultSpaceship = TestUtil.resourceJsonToSpaceship(result.getResponse().getContentAsString());
 		assertThat(resultSpaceship.getId()).isNotNull();
 		assertThat(resultSpaceship.getName()).isEqualTo("spaceshipOne");
 		assertThat(resultSpaceship.isReadyToFly()).isTrue();
@@ -150,8 +157,7 @@ public class SpaceshipControllerIntegrationTest {
 	public void testGetAllReadyToFlySpaceships() throws Exception {
 		MvcResult result = mockMvc.perform(get(baseUrl + "/spaceships").param("readyToFly", "true"))//
 				.andExpect(status().is2xxSuccessful()).andReturn();
-
-		List<?> spaceship = TestUtil.toObject(result.getResponse().getContentAsString(), List.class);
+		List<?> spaceship = TestUtil.resourcesJsonToSpaceshipList(result.getResponse().getContentAsString());
 		List<Spaceship> expectedReadyToFlySpaceships = repository.findReadyToFlySpaceships().get();
 
 		assertThat(spaceship.size()).isEqualTo(expectedReadyToFlySpaceships.size());
@@ -186,7 +192,7 @@ public class SpaceshipControllerIntegrationTest {
 				.andExpect(status().is2xxSuccessful())//
 				.andReturn();
 
-		Spaceship resultSpaceship = TestUtil.toObject(result.getResponse().getContentAsString(), Spaceship.class);
+		Spaceship resultSpaceship = TestUtil.resourceJsonToSpaceship(result.getResponse().getContentAsString());
 		assertThat(resultSpaceship).isEqualTo(spaceshipOne);
 	}
 
@@ -208,7 +214,7 @@ public class SpaceshipControllerIntegrationTest {
 				.andExpect(status().is2xxSuccessful())//
 				.andReturn();
 
-		Spaceship resultSpaceship = TestUtil.toObject(result.getResponse().getContentAsString(), Spaceship.class);
+		Spaceship resultSpaceship = TestUtil.resourceJsonToSpaceship(result.getResponse().getContentAsString());
 		assertThat(resultSpaceship.getName()).isEqualTo("spaceshipOne");
 		assertThat(resultSpaceship.isContainsDroid()).isTrue();
 	}
@@ -230,7 +236,7 @@ public class SpaceshipControllerIntegrationTest {
 				.andExpect(status().is2xxSuccessful())//
 				.andReturn();
 		
-		Spaceship updatedSpaceship = TestUtil.toObject(result.getResponse().getContentAsString(), Spaceship.class);
+		Spaceship updatedSpaceship = TestUtil.resourceJsonToSpaceship(result.getResponse().getContentAsString());
 		
 		assertThat(updatedSpaceship.getPilots().size()).isEqualTo(2);
 		assertThat(updatedSpaceship.getPilots().get(0)).isEqualTo(pilot1);
@@ -249,7 +255,7 @@ public class SpaceshipControllerIntegrationTest {
 						.content(emptyListJson))//
 				.andExpect(status().is2xxSuccessful()).andReturn();
 		
-		Spaceship updatedSpaceship = TestUtil.toObject(result.getResponse().getContentAsString(), Spaceship.class);
+		Spaceship updatedSpaceship = TestUtil.resourceJsonToSpaceship(result.getResponse().getContentAsString());
 		
 		assertThat(updatedSpaceship.getPilots().size()).isEqualTo(0L);
 	}

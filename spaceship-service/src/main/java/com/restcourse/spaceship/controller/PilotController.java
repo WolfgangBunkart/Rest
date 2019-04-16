@@ -28,7 +28,7 @@ public class PilotController {
 	private SpaceshipService service;
 
 	@Autowired
-	private PilotController(SpaceshipService service) {
+	public PilotController(SpaceshipService service) {
 		this.service = service;
 	}
 	
